@@ -140,6 +140,27 @@ func normalize(address string) string {
 	return address
 }
 
+func ListenHealth() error {
+	healthAddr := "0.0.0.0:8080"
+	l, err := net.Listen("tcp", healthAddr)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+	fmt.Println("gortc/stund health listening on", healthAddr, "via tcp")
+	for {
+		conn, err := l.Accept()
+		log.Printf("health new connection %s", conn.RemoteAddr().String())
+		if err != nil {
+			log.Printf("health accept error %+v", err)
+		}
+		buf := make([]byte, 8)
+		_, err = conn.Read(buf)
+		conn.Close()
+		log.Print("close health connection")
+	}
+}
+
 func main() {
 	flag.Parse()
 	if *profile {
@@ -147,6 +168,7 @@ func main() {
 			log.Println(http.ListenAndServe("localhost:6060", nil))
 		}()
 	}
+	go ListenHealth()
 	switch *network {
 	case "udp":
 		normalized := normalize(*address)

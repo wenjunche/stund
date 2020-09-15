@@ -1,0 +1,10 @@
+FROM 041175032282.dkr.ecr.us-east-1.amazonaws.com/of-centos7:stable-3.0.2 AS base
+WORKDIR /app
+COPY stund .
+ARG SERVICE_SHA
+ARG SERVICE_VERSION
+ENV SERVICE_SHA=$SERVICE_SHA
+ENV SERVICE_VERSION=$SERVICE_VERSION
+ENV APP_NAME webrtc-stund
+ENV AWS_REGION us-east-1
+CMD ["./stund"]
